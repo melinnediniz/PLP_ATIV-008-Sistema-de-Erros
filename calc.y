@@ -1,6 +1,5 @@
 /*
-	Calculadora v.6 - Sistema de controle de erros de compilação - yyerror + linha
-	Jucimar Jr
+	Calculadora v.6.1 - Tratamento de erros
 */
 
 %{
@@ -15,10 +14,7 @@ extern FILE* yyin;
 extern int yylineno;
 extern char *yytext;
 
-//int yyerror(char *s, int linha, char *mensagem );
-//int yyerror(char *msg, int error_line_number, char *error_msg);
-
-void yyerror(char *s);
+void yyerror(const char *message);
 int yylex();
 int yyparse();
 
@@ -41,7 +37,7 @@ char *teste;
 %%
 
 STATEMENT:
-	STATEMENT EXPRESSION EOL {$$ = $2; printf("Resultado: %f\n", $2);}
+	STATEMENT EXPRESSION EOL {$$ = $2; printf("%f\n", $2);}
 	|
 	;
 
@@ -50,13 +46,18 @@ EXPRESSION:
 	|	EXPRESSION PLUS EXPRESSION {$$ = $1 + $3;}
 	|	EXPRESSION MINUS EXPRESSION {$$ = $1 - $3;}
 	|	EXPRESSION TIMES EXPRESSION {$$ = $1 * $3;}
-	|	EXPRESSION DIVIDE EXPRESSION {$$ = $1 / $3;}
+	|	EXPRESSION DIVIDE EXPRESSION {
+			if($3 == 0){
+				yyerror("Division by zero");
+			}else{
+				$$ = $1 / $3;
+			}
+		}
 	|	P_LEFT EXPRESSION P_RIGHT {$$ = $2;}
 	;
 
 
 %%
-
 
 int main(int argc, char *argv[])
 {
@@ -81,14 +82,14 @@ int main(int argc, char *argv[])
 }
 
 
-void yyerror(char *s)
+void yyerror(const char *message)
 {
-	printf("Error: Line: %d  Msg:%s\n\n", yylineno, s);
-	printf("Error2: Line: %d  Msg:%s\n\n", yylineno, teste);
+	printf("RuntimeError: %s. Line: %d\n", message, yylineno);
+	errors++;
 }
 
-/*
-int yyerror(char *s, int linha, char *mensagem ) 
+
+/* int yyerror(char *s, int linha, char *mensagem ) 
 { 
 
 	if ( s != NULL ) 
@@ -97,5 +98,4 @@ int yyerror(char *s, int linha, char *mensagem )
 				printf ("Linha: %d ---------> ERRO: %s %s \n", linha, s );
 	
 	return 0;
-}
-*/
+}*/

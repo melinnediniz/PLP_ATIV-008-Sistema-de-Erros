@@ -6,7 +6,4 @@
 
 Lidar com o tratamento de erros dos seguintes casos:
 
-- Símbolos desconhecidos
-- Erros de grafia de identificador
-- Erros de grafia de operador
 - Divisão por 0
